@@ -1,4 +1,4 @@
-# logistik laravel-CI Framework
+# Logistik laravel-CI Framework
 
-## turn on server using command `php artisan serve` on logistik-restserver directory
+Turn on server using command `php artisan serve` on logistik-restserver directory
 
