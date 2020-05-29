@@ -1,6 +1,6 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
-class member extends CI_Controller
+class barang extends CI_Controller
 {
 
     var $API = "";
@@ -15,16 +15,16 @@ class member extends CI_Controller
         $this->load->helper('url');
     }
 
-    // menampilkan data member
+    // menampilkan data barang
     public function index()
     {
-        $respon = json_decode($this->curl->simple_get($this->API . '/operator'));
-        $data['dataoperator'] = $respon;
-        $this->load->view('member/index', $data);
-        echo var_dump($data);
+        $respon = json_decode($this->curl->simple_get($this->API . '/barang'));
+        $data['barang'] = $respon->values;
+        $this->load->view('template/header', $data);
+        $this->load->view('barang/index', $data);
     }
 
-    // insert data member
+    // insert data barang
     function create()
     {
         if (isset($_POST['submit'])) {
@@ -33,21 +33,21 @@ class member extends CI_Controller
                 'nama' => $this->input->post('nama'),
                 'no_telp' => $this->input->post('no_telp'),
                 'email' => $this->input->post('email'),
-                'no_member' => $this->input->post('no_member')
+                'no_barang' => $this->input->post('no_barang')
             );
-            $insert =  $this->curl->simple_post($this->API . '/member', $data, array(CURLOPT_BUFFERSIZE => 100));
+            $insert =  $this->curl->simple_post($this->API . '/barang', $data, array(CURLOPT_BUFFERSIZE => 100));
             if ($insert) {
                 $this->session->set_flashdata('hasil', 'Insert Data Berhasil');
             } else {
                 $this->session->set_flashdata('hasil', 'Insert Data Gagal');
             }
-            redirect('member');
+            redirect('barang');
         } else {
-            $this->load->view('member/create');
+            $this->load->view('barang/create');
         }
     }
 
-    // edit data member
+    // edit data barang
     function edit()
     {
         if (isset($_POST['submit'])) {
@@ -56,37 +56,43 @@ class member extends CI_Controller
                 'nama' => $this->input->post('nama'),
                 'no_telp' => $this->input->post('no_telp'),
                 'email' => $this->input->post('email'),
-                'no_member' => $this->input->post('no_member')
+                'no_barang' => $this->input->post('no_barang')
             );
 
-            $update =  $this->curl->simple_put($this->API . '/member', $data, array(CURLOPT_BUFFERSIZE => 100));
+            $update =  $this->curl->simple_put($this->API . '/barang', $data, array(CURLOPT_BUFFERSIZE => 100));
             if ($update) {
                 $this->session->set_flashdata('hasil', 'Update Data Berhasil');
             } else {
                 $this->session->set_flashdata('hasil', 'Update Data Gagal');
             }
-            redirect('member');
+            redirect('barang');
         } else {
             $params = array('id' =>  $this->uri->segment(3));
-            $respon = json_decode($this->curl->simple_get($this->API . '/member', $params));
-            $data['datamember'] = $respon->data;
-            $this->load->view('member/edit', $data);
+            $respon = json_decode($this->curl->simple_get($this->API . '/barang', $params));
+            $data['databarang'] = $respon->data;
+            $this->load->view('barang/edit', $data);
         }
     }
 
-    // delete data member
+    // delete data barang
     function delete($id)
     {
         if (empty($id)) {
-            redirect('member');
+            redirect('barang');
         } else {
-            $delete =  $this->curl->simple_delete($this->API . '/member', array('id' => $id), array(CURLOPT_BUFFERSIZE => 100));
+            $delete =  $this->curl->simple_delete($this->API . '/barang', array('id' => $id), array(CURLOPT_BUFFERSIZE => 100));
             if ($delete) {
                 $this->session->set_flashdata('hasil', 'Delete Data Berhasil');
             } else {
                 $this->session->set_flashdata('hasil', 'Delete Data Gagal');
             }
-            redirect('member');
+            redirect('barang');
         }
+    }
+
+    function logout()
+    {
+        $this->session->sess_destroy();
+        redirect('login');
     }
 }

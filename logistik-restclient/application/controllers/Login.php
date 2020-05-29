@@ -22,7 +22,7 @@ class Login extends CI_Controller
 	{
 		if ($this->admin->logged_id()) {
 			//jika memang session sudah terdaftar, maka redirect ke halaman dahsboard
-			redirect("member");
+			redirect("barang");
 			echo var_dump($_SESSION);
 		} else {
 
@@ -41,36 +41,37 @@ class Login extends CI_Controller
 
 				//get data dari FORM
 				$username = $this->input->post("username", TRUE);
-				$password = $this->input->post('password', TRUE);
+				$password = md5($this->input->post('password', TRUE));
 				//checking data via model
-				// $checking = $this->admin->check_login('operator', array('nama' => $username), array('password' => $password));
-				$checking = $this->admin->check_login('operator', $username, $password);
-				echo var_dump($checking);
+				// echo $username . '<br>' . $password;
+				$checking = $this->admin->check_login($username, $password);
 				//jika ditemukan, maka create session
-				if ($checking != "gagal") {
-					// echo var_dump($checking);
-					// foreach ($checking as $apps) {
+				// echo var_dump($checking);
+				if ($checking == "gagal") {
 
+					$data['error'] = '<div class="alert alert-danger" style="margin-top: 3px">
+	                	<div class="header"><b><i class="fa fa-exclamation-circle"></i> ERROR</b> username atau password salah!</div></div>';
+					$this->load->view('login', $data);
+				} else {
 					$asdf = array(
 						'id'   => $checking->id,
-						'name' => $checking->nama,
+						'nama' => $checking->nama,
 						'password' => $checking->password,
 					);
 					//set session userdata
 					$this->session->set_userdata($asdf);
 
-					// redirect('dashboard/');
-					// }
-				} else {
-
-					$data['error'] = '<div class="alert alert-danger" style="margin-top: 3px">
-	                	<div class="header"><b><i class="fa fa-exclamation-circle"></i> ERROR</b> username atau password salah!</div></div>';
-					$this->load->view('login', $data);
+					redirect('barang');
 				}
 			} else {
 
 				$this->load->view('login');
 			}
 		}
+	}
+	function logout()
+	{
+		$this->session->sess_destroy();
+		redirect('login');
 	}
 }
