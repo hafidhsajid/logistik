@@ -36,7 +36,7 @@ class HistoryController extends Controller
     public function create(Request $request)
     {
         $histry = new History();
-        $histry->id_user = $request->id_user;
+        $histry->id_operator = $request->id_operator;
         $histry->id_barang = $request->id_barang;
         $histry->jenis = $request->jenis;
         $histry->tanggal = $request->tanggal;
@@ -53,13 +53,13 @@ class HistoryController extends Controller
     public function update(Request $request, $id)
     {
         # code...
-        $id_user    = $request->id_user;
+        $id_operator    = $request->id_operator;
         $id_barang  = $request->id_barang;
         $jenis      = $request->jenis;
         $tanggal    = $request->tanggal;
 
         $histry = History::find($id);
-        $histry->id_user    = $id_user;
+        $histry->id_operator    = $id_operator;
         $histry->id_barang  = $id_barang;
         $histry->jenis      = $jenis;
         $histry->tanggal    = $tanggal;

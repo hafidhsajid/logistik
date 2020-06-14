@@ -29,11 +29,9 @@ class operator extends CI_Controller
     {
         if (isset($_POST['submit'])) {
             $data = array(
-                'id' => $this->input->NULL,
                 'nama' => $this->input->post('nama'),
-                'no_telp' => $this->input->post('no_telp'),
-                'email' => $this->input->post('email'),
-                'no_operator' => $this->input->post('no_operator')
+                'password' => md5($this->input->post('password')),
+                'level' => $this->input->post('level')
             );
             $insert =  $this->curl->simple_post($this->API . '/operator', $data, array(CURLOPT_BUFFERSIZE => 100));
             if ($insert) {
@@ -48,29 +46,31 @@ class operator extends CI_Controller
     }
 
     // edit data operator
-    function edit()
+    function update()
     {
         if (isset($_POST['submit'])) {
             $data = array(
                 'id' => $this->input->post('id'),
                 'nama' => $this->input->post('nama'),
-                'no_telp' => $this->input->post('no_telp'),
-                'email' => $this->input->post('email'),
-                'no_operator' => $this->input->post('no_operator')
+                'password' => md5($this->input->post('password')),
+                'level' => $this->input->post('level')
             );
 
-            $update =  $this->curl->simple_put($this->API . '/operator', $data, array(CURLOPT_BUFFERSIZE => 100));
+            $update =  $this->curl->simple_put($this->API . '/operator/update/' . $data["id"], $data, array(CURLOPT_BUFFERSIZE => 100));
             if ($update) {
                 $this->session->set_flashdata('hasil', 'Update Data Berhasil');
             } else {
                 $this->session->set_flashdata('hasil', 'Update Data Gagal');
             }
+            // echo $this->API . '/operator/update/' . $data["id"];
+            // echo var_dump($data);
             redirect('operator');
         } else {
             $params = array('id' =>  $this->uri->segment(3));
             $respon = json_decode($this->curl->simple_get($this->API . '/operator', $params));
-            $data['dataoperator'] = $respon->data;
-            $this->load->view('operator/edit', $data);
+            $data['id'] = $params;
+            $data['dataoperator'] = $respon->values;
+            $this->load->view('operator/update', $data);
         }
     }
 
@@ -80,7 +80,7 @@ class operator extends CI_Controller
         if (empty($id)) {
             redirect('operator');
         } else {
-            $delete =  $this->curl->simple_delete($this->API . '/operator', array('id' => $id), array(CURLOPT_BUFFERSIZE => 100));
+            $delete =  $this->curl->simple_delete($this->API . '/operator/' . $id, array(CURLOPT_BUFFERSIZE => 100));
             if ($delete) {
                 $this->session->set_flashdata('hasil', 'Delete Data Berhasil');
             } else {

@@ -9,6 +9,8 @@ class history extends CI_Controller
     {
         parent::__construct();
         $this->API = "http://localhost:8000/api";
+        // $this->load->view('barang_model');
+        $this->load->library('form_validation');
         $this->load->library('session');
         $this->load->library('curl');
         $this->load->helper('form');
@@ -20,8 +22,9 @@ class history extends CI_Controller
     {
         $respon = json_decode($this->curl->simple_get($this->API . '/history'));
         $data['history'] = $respon->values;
+        $data['barang'] = json_decode($this->curl->simple_get($this->API . '/barang'));
+        $data['operator'] = json_decode($this->curl->simple_get($this->API . '/operator'));
         $this->load->view('template/header', $data);
-
         $this->load->view('history/index', $data);
     }
 
@@ -30,13 +33,11 @@ class history extends CI_Controller
     {
         if (isset($_POST['submit'])) {
             $data = array(
-                'id' => $this->input->NULL,
-                'nama' => $this->input->post('nama'),
-                'no_telp' => $this->input->post('no_telp'),
-                'email' => $this->input->post('email'),
-                'no_history' => $this->input->post('no_history')
+                // 'id' => $this->input->NULL,
+                'id_operator' => $this->input->post('id_operator'),
+                'id_barang' => $this->input->post('id_barang')
             );
-            $insert =  $this->curl->simple_post($this->API . '/history', $data, array(CURLOPT_BUFFERSIZE => 100));
+            $insert =  $this->curl->simple_post($this->API . '/history', $data);
             if ($insert) {
                 $this->session->set_flashdata('hasil', 'Insert Data Berhasil');
             } else {
@@ -44,34 +45,38 @@ class history extends CI_Controller
             }
             redirect('history');
         } else {
-            $this->load->view('history/create');
+            $get['barang'] = json_decode($this->curl->simple_get($this->API . '/barang'));
+            $get['operator'] = json_decode($this->curl->simple_get($this->API . '/operator'));
+            $this->load->view('history/create', $get);
         }
     }
 
     // edit data history
-    function edit()
+    function update()
     {
         if (isset($_POST['submit'])) {
             $data = array(
                 'id' => $this->input->post('id'),
-                'nama' => $this->input->post('nama'),
-                'no_telp' => $this->input->post('no_telp'),
-                'email' => $this->input->post('email'),
-                'no_history' => $this->input->post('no_history')
+                'id_operator' => $this->input->post('id_operator'),
+                'id_barang' => $this->input->post('id_barang'),
             );
 
-            $update =  $this->curl->simple_put($this->API . '/history', $data, array(CURLOPT_BUFFERSIZE => 100));
+            $update =  $this->curl->simple_put($this->API . '/history/update/' . $data["id"], $data, array(CURLOPT_BUFFERSIZE => 100));
             if ($update) {
                 $this->session->set_flashdata('hasil', 'Update Data Berhasil');
             } else {
                 $this->session->set_flashdata('hasil', 'Update Data Gagal');
             }
+            echo var_dump($data);
             redirect('history');
         } else {
             $params = array('id' =>  $this->uri->segment(3));
             $respon = json_decode($this->curl->simple_get($this->API . '/history', $params));
-            $data['datahistory'] = $respon->data;
-            $this->load->view('history/edit', $data);
+            $data['barang'] = json_decode($this->curl->simple_get($this->API . '/barang'));
+            $data['operator'] = json_decode($this->curl->simple_get($this->API . '/operator'));
+            $data['id'] = $this->uri->segment(3);
+            $data['datahistory'] = $respon->values;
+            $this->load->view('history/update', $data);
         }
     }
 
@@ -81,12 +86,13 @@ class history extends CI_Controller
         if (empty($id)) {
             redirect('history');
         } else {
-            $delete =  $this->curl->simple_delete($this->API . '/history', array('id' => $id), array(CURLOPT_BUFFERSIZE => 100));
+            $delete =  $this->curl->simple_delete($this->API . '/history/' . $id, array(CURLOPT_BUFFERSIZE => 100));
             if ($delete) {
                 $this->session->set_flashdata('hasil', 'Delete Data Berhasil');
             } else {
                 $this->session->set_flashdata('hasil', 'Delete Data Gagal');
             }
+            // echo var_dump($this->API . '/history/' . $id);
             redirect('history');
         }
     }
